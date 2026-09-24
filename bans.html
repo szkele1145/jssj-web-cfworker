@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>建设世界 · 封挂榜</title>
+<meta name="description" content="建设世界封挂榜：近期封禁记录公示。">
+<meta property="og:title" content="建设世界 · 封挂榜">
+<meta property="og:description" content="建设世界封挂榜：近期封禁记录公示。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://szkele1145.github.io/jssj-web-cfworker/bans.html">
+<meta property="og:image" content="https://jssj.cc.cd/favicon.png">
+<meta name="theme-color" content="#f7f8fa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#08090b">
+
+<link rel="stylesheet" href="css/fontawesome/all.min.css?v=20260911i">
+<link rel="icon" href="favicon.png">
+<link rel="stylesheet" href="css/style.css?v=20260911i">
+<script src="js/theme.js?v=20260911i"></script>
+<script>(function(){try{var d=document.documentElement,t=localStorage.getItem("theme");var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);var custom=(t==="custom");if(custom){d.classList.add("custom");d.style.colorScheme="dark";var s=localStorage.getItem("themeCustom:vars")||"";s.split("\n").forEach(function(l){var i=l.indexOf(":");if(i<1)return;var n=l.slice(0,i),v=l.slice(i+1);if(!/^--[a-z0-9-]+$/i.test(n))return;if(/["'<>`]/.test(v))return;d.style.setProperty(n,v);});}else if(light){d.classList.add("light-mode");}else if(t==="glass"){d.classList.add("glass");}d.style.colorScheme=(light&&!custom)?"light":"dark";}catch(e){}})();</script>
+<script>(function(){try{var v=localStorage.getItem('vid');if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);localStorage.setItem('vid',v);}var b=jssjApiBase();fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});}catch(e){}})();</script>
+</head>
+<body>
+
+<div class="glass-glow" aria-hidden="true"></div>
+<div class="grid-background"></div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <span>目录</span>
+    <button class="sidebar-close" id="sidebarClose" type="button" aria-label="关闭目录"><i class="fas fa-times"></i></button>
+  </div>
+  <div class="sidebar-menu">
+    <a href="index.html"><i class="fas fa-home"></i> 首页</a>
+    <a href="server.html"><i class="fas fa-server"></i> 服务器</a>
+    <a href="members.html"><i class="fas fa-users"></i> 成员</a>
+    <a href="forum.html"><i class="fas fa-comment-dots"></i> 动态</a>
+    <a href="newcomer.html"><i class="fas fa-book-open"></i> 新人须知</a>
+    <a href="votes.html"><i class="fas fa-poll"></i> 投票</a>
+    <a href="legends.html"><i class="fas fa-crown"></i> 神人榜</a>
+    <a href="bans.html"><i class="fas fa-gavel"></i> 封挂榜</a>
+    <a href="download.html"><i class="fas fa-download"></i> 下载</a>
+    <a href="donate.html"><i class="fas fa-heart"></i> 捐赠</a>
+    <a href="search.html"><i class="fas fa-search"></i> 搜索</a>
+    <a href="feedback.html"><i class="fas fa-comment-medical"></i> 反馈</a>
+    <a href="about.html"><i class="fas fa-info-circle"></i> 关于</a>
+  </div>
+  <div class="sidebar-foot"><i class="fas fa-ellipsis-h"></i> v0.3.3</div>
+</nav>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<div class="app">
+  <header class="navbar">
+    <div class="navbar-left">
+      <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="打开目录" aria-controls="sidebar" aria-expanded="false"><i class="fas fa-bars"></i></button>
+      <a class="server-name" href="index.html">建设世界</a>
+    </div>
+    <div class="navbar-right">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-label="切换主题"><i class="fas fa-moon" id="themeIcon"></i></button>
+    </div>
+  </header><main class="main-content" id="main">
+    <div class="page-container">
+      <div class="page-stack">
+        <div class="server-header">
+          <h2><i class="fas fa-gavel"></i> 封挂榜</h2>
+        </div>
+
+        <div class="server-status-card">
+          <div class="bans-table">
+            <div class="ban-row header">
+              <span>玩家</span>
+              <span>原因</span>
+              <span>日期</span>
+            </div>
+            <div id="banList">
+              <div class="mc-state state-loading"><span class="spinner" aria-hidden="true"></span><span>加载中…</span></div>
+            </div>
+          </div>
+          <div>— 仅展示近期封禁记录 —</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="footer-copy">© 2077 建设世界. 并不保留所有权利。</div>
+</div>
+
+
+<script src="js/bans.js?v=20260911i"></script>
+<script src="js/ui.js?v=20260911i"></script>
+</body>
+</html>
