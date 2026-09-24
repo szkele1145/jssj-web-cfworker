@@ -152,13 +152,24 @@
       <div class="tab-content" id="tab-downloads">
         <div class="card"><h2>📥 下载中心</h2><div id="downloadList" class="post-list"><div class="empty-state state-loading"><span class="spinner" aria-hidden="true"></span></div></div></div>
         <div class="card">
+          <h2>☁️ 从 GitHub Release 同步</h2>
+          <div class="row-note" id="ghSyncRepo">正在读取配置…</div>
+          <div class="row-tight" style="margin:.75rem 0;">
+            <button type="button" class="btn btn-primary" id="ghSyncBtn">🔄 从 GitHub Release 同步</button>
+            <button type="button" class="btn btn-sm" id="ghPreviewBtn">预览（不写入）</button>
+            <button type="button" class="btn btn-sm" id="ghReloadBtn">刷新缓存</button>
+          </div>
+          <div id="ghReleaseList" class="post-list"><div class="empty-state state-loading"><span class="spinner" aria-hidden="true"></span></div></div>
+        </div>
+        <div class="card">
           <h2>📝 添加下载项</h2>
           <form id="downloadForm">
             <div class="form-row">
               <div class="form-group"><label>名称 *</label><input type="text" id="downloadName" placeholder="如：建设世界客户端" maxlength="100" required></div>
               <div class="form-group"><label>文件大小（选填）</label><input type="text" id="downloadSize" placeholder="如：128MB / 1.2GB" maxlength="30"></div>
             </div>
-            <div class="form-group"><label>上传文件（直接传到服务器，推荐）</label><input type="file" id="downloadFile"></div>
+            <div class="form-group" hidden><input type="file" id="downloadFile" hidden></div>
+            <div class="form-group"><label>文件来源</label><div class="row-note">本版不接收文件上传：把文件放到 GitHub Release（网页拖拽即可），再点上面的「🔄 从 GitHub Release 同步」自动生成下载项；也可以直接在下面填 Release 资源直链。</div></div>
             <div class="form-group" id="downloadProgressBox" hidden>
               <label>上传进度</label>
               <div class="row-tight">
@@ -167,12 +178,12 @@
               </div>
               <div class="row-note" id="downloadProgressSpeed"></div>
             </div>
-            <div class="form-group"><label>或填外部下载链接（选填，二者填一个）</label><input type="text" id="downloadUrl" placeholder="https://外部地址 或留空用上传文件" maxlength="500"></div>
+            <div class="form-group"><label>下载链接（GitHub Release 资源直链）</label><input type="text" id="downloadUrl" placeholder="https://github.com/&lt;owner&gt;/&lt;repo&gt;/releases/download/&lt;tag&gt;/&lt;文件名&gt;" maxlength="500"></div>
             <div class="form-group"><label>描述</label><textarea id="downloadDesc" placeholder="描述这个文件是什么、适用版本等" rows="2" maxlength="500"></textarea></div>
-            <div class="form-row"><div class="form-group"></div><div class="form-group row-actions"><button type="submit" class="btn btn-primary" id="downloadSubmitBtn">上传并添加</button></div></div>
+            <div class="form-row"><div class="form-group"></div><div class="form-group row-actions"><button type="submit" class="btn btn-primary" id="downloadSubmitBtn">添加下载项</button></div></div>
           </form>
         </div>
-        <div class="card"><h2>🗂️ 已上传文件</h2><div id="downloadFileList" class="post-list"><div class="empty-state state-loading"><span class="spinner" aria-hidden="true"></span></div></div></div>
+        <div class="card"><h2>☁️ GitHub Release 文件</h2><div id="downloadFileList" class="post-list"><div class="empty-state state-loading"><span class="spinner" aria-hidden="true"></span></div></div></div>
       </div>
 
       <!-- 反馈 -->
@@ -1141,7 +1152,7 @@ function esc(s) {
       if (!adminPassword) { showToast('请先登录', 'error'); return; }
       const btn = document.getElementById('downloadSubmitBtn');
       btn.disabled = true;
-      btn.textContent = '上传中...';
+      btn.textContent = '添加中...';
       const progressBox = document.getElementById('downloadProgressBox');
       const progressBar = document.getElementById('downloadProgressBar');
       const progressText = document.getElementById('downloadProgressText');
@@ -1158,7 +1169,7 @@ function esc(s) {
           if (!size) size = formatFileSize(data.size);
         }
         progressBox.hidden = true;
-        if (!url) { showToast('请上传文件或填写外部链接', 'error'); btn.disabled = false; btn.textContent = '上传并添加'; return; }
+        if (!url) { showToast('请填写 GitHub Release 资源直链', 'error'); btn.disabled = false; btn.textContent = '添加下载项'; return; }
         const createResp = await fetchApi('/api/downloads', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + adminPassword },
@@ -1169,7 +1180,7 @@ function esc(s) {
         else { showToast('❌ ' + (createData.error || '失败'), 'error'); if (createResp.status === 401) logout(); }
       } catch (err) { showToast('失败: ' + err.message, 'error'); }
       btn.disabled = false;
-      btn.textContent = '上传并添加';
+      btn.textContent = '添加下载项';
     });
 
     function uploadWithProgress(file) {
@@ -1697,5 +1708,208 @@ function esc(s) {
     });
   </script>
 <script src="js/ui.js?v=20260911i"></script>
+<script>
+/* ============================================================
+ * CF Worker 版补丁 · 后台「下载中心」接入 GitHub Releases
+ * ------------------------------------------------------------
+ * 这个文件由 cf-worker/tools/make-front.mjs 注入到 admin.html 末尾的
+ * <script> 里，**别直接改 public/admin.html**（下次同步会被覆盖）。
+ *
+ * 为什么不改后台的业务代码，而是在外面包一层：
+ *   · 后台那套表单/列表逻辑同时服务 Node 版（有服务器磁盘、能直接上传），
+ *     源仓库里不能按某个部署平台改；
+ *   · 这里只覆盖「渲染已上传文件」这一个函数，其余（增删改查）完全复用。
+ *
+ * 它做三件事：
+ *   1. 读 Release 列表并展示（含未配 GH_TOKEN 的提示，便于排障）
+ *   2. 提供「同步 / 预览」按钮 → POST /api/downloads/sync
+ *   3. 覆盖 loadDownloadFiles()：GitHub 的资源链接是**绝对地址**，
+ *      原版会渲染成 API_BASE + 'https://github.com/…'（打不开）
+ * ============================================================ */
+(function () {
+  'use strict';
+
+  var releasesLoaded = false;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function esc2(s) {
+    if (typeof esc === 'function') return esc(s);
+    return String(s === null || s === undefined ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function toast(msg, type) {
+    if (typeof showToast === 'function') showToast(msg, type);
+  }
+
+  function currentPassword() {
+    try {
+      return typeof adminPassword === 'string' ? adminPassword : '';
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /** 带管理员 token 的 fetchApi 封装 */
+  function api(path, options) {
+    var opts = options || {};
+    opts.headers = Object.assign({}, opts.headers || {}, { Authorization: 'Bearer ' + currentPassword() });
+    return fetchApi(path, opts).then(function (r) {
+      return r.json();
+    });
+  }
+
+  // ----------------------------------------------------------
+  // Release 列表
+  // ----------------------------------------------------------
+  function renderReleases(data) {
+    var box = $('ghReleaseList');
+    var repo = $('ghSyncRepo');
+    if (repo) {
+      repo.textContent =
+        '仓库：' + data.repo +
+        (data.authenticated ? '（已配置 GH_TOKEN）' : '（未配 GH_TOKEN：每小时 60 次限额，只读公开仓库）') +
+        (data.cached ? ' · 来自 10 分钟缓存' : ' · 刚刚拉取');
+    }
+    if (!box) return;
+    if (!data.releases || !data.releases.length) {
+      box.innerHTML = '<div class="empty-state">📭 这个仓库还没有 Release</div>';
+      return;
+    }
+    box.innerHTML = data.releases.map(function (r) {
+      var assets = (r.assets || []).map(function (a) {
+        return esc2(a.name) + '（' + esc2(a.sizeText) + '，下载 ' + (a.downloadCount || 0) + ' 次）';
+      }).join('　') || '（无资源）';
+      return '<div class="post-item">' +
+        '<div class="info">' +
+          '<span class="title">' + esc2(r.name || r.tag) + '</span>' +
+          '<span class="meta">' + esc2(r.tag) + (r.prerelease ? ' · 预发布' : '') + ' · ' + r.assetCount + ' 个文件 · ' + esc2(String(r.publishedAt || '').slice(0, 10)) + '</span>' +
+          '<span class="meta">' + assets + '</span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function loadReleases(force) {
+    var box = $('ghReleaseList');
+    if (box) box.innerHTML = '<div class="empty-state state-loading"><span class="spinner" aria-hidden="true"></span></div>';
+    if (!currentPassword()) {
+      if (box) box.innerHTML = '<div class="empty-state">请先登录后台</div>';
+      return Promise.resolve();
+    }
+    return api('/api/downloads/releases' + (force ? '?force=1' : ''))
+      .then(function (data) {
+        if (!data.success) throw new Error(data.error || '读取失败');
+        renderReleases(data);
+      })
+      .catch(function (e) {
+        var repo = $('ghSyncRepo');
+        if (repo) repo.textContent = 'Release 配置读不出来';
+        if (box) box.innerHTML = '<div class="empty-state">❌ ' + esc2(e && e.message ? e.message : String(e)) + '</div>';
+      });
+  }
+
+  // ----------------------------------------------------------
+  // 同步
+  // ----------------------------------------------------------
+  function sync(dryRun) {
+    if (!currentPassword()) {
+      toast('请先登录', 'error');
+      return;
+    }
+    var btn = $('ghSyncBtn');
+    var old = btn ? btn.textContent : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = dryRun ? '预览中…' : '同步中…';
+    }
+    api('/api/downloads/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ dryRun: !!dryRun }),
+    })
+      .then(function (data) {
+        if (!data.success) throw new Error(data.error || '同步失败');
+        toast((dryRun ? '👀 ' : '✅ ') + (data.message || '完成'));
+        if (!dryRun) {
+          if (typeof loadDownloads === 'function') loadDownloads();
+          if (typeof window.loadDownloadFiles === 'function') window.loadDownloadFiles();
+        }
+      })
+      .catch(function (e) {
+        toast('❌ ' + (e && e.message ? e.message : String(e)), 'error');
+      })
+      .then(function () {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = old;
+        }
+      });
+  }
+
+  // ----------------------------------------------------------
+  // 覆盖「已上传文件」的渲染
+  // ----------------------------------------------------------
+  window.loadDownloadFiles = function () {
+    // 下载页第一次打开时顺带把 Release 列表读出来（避免一进后台就白花一次 API 调用）
+    if (!releasesLoaded) {
+      releasesLoaded = true;
+      loadReleases(false);
+    }
+
+    var container = $('downloadFileList');
+    if (!container) return Promise.resolve();
+    if (!currentPassword()) {
+      container.innerHTML = '<div class="empty-state">请先登录后台</div>';
+      return Promise.resolve();
+    }
+
+    return api('/api/downloads/files')
+      .then(function (data) {
+        if (!data.success || !data.files || !data.files.length) {
+          container.innerHTML = '<div class="empty-state">📭 Release 里还没有文件</div>';
+          return;
+        }
+        container.innerHTML = data.files.map(function (f) {
+          return '<div class="post-item items-center">' +
+            '<div class="info">' +
+              '<span class="title truncate-sm">' + esc2(f.filename) + '</span>' +
+              '<span class="meta">' + esc2(f.sizeText || '') +
+                (f.release ? ' · ' + esc2(f.release) : '') +
+                ' · 下载 ' + (f.downloadCount || 0) + ' 次</span>' +
+            '</div>' +
+            '<div class="actions">' +
+              '<a href="' + esc2(f.url) + '" target="_blank" rel="noopener" class="btn btn-sm">打开</a>' +
+              '<button class="btn btn-danger" onclick="deleteDownloadFile(\'' + esc2(f.filename) + '\')">删除</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      })
+      .catch(function (e) {
+        container.innerHTML = '<div class="empty-state">❌ ' + esc2(e && e.message ? e.message : String(e)) + '</div>';
+      });
+  };
+
+  // ----------------------------------------------------------
+  // 按钮绑定
+  // ----------------------------------------------------------
+  function wire() {
+    var s = $('ghSyncBtn');
+    var p = $('ghPreviewBtn');
+    var r = $('ghReloadBtn');
+    if (s) s.addEventListener('click', function () { sync(false); });
+    if (p) p.addEventListener('click', function () { sync(true); });
+    if (r) r.addEventListener('click', function () { releasesLoaded = true; loadReleases(true); });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();
+
+</script>
 </body>
 </html>
