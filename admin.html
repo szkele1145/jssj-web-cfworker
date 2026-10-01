@@ -65,6 +65,37 @@ d.style.colorScheme=(light&&!custom)?"light":"dark";
           paint();
         }
       }, 6000);
+
+      /* ★ 第二段体检：登录框**在 DOM 里但看不见**时，把关键样式/媒体查询状态报出来。
+       *   只在确实异常时才弹（正常页面绝不误报）。 */
+      window.setTimeout(function () {
+        var box = document.querySelector('.auth-box-wrap') || document.querySelector('input[type=password]');
+        if (!box) return;
+        var el = box.closest('.auth-box-wrap') || box;
+        var cs = getComputedStyle(el);
+        var r = el.getBoundingClientRect();
+        var vv = window.visualViewport;
+        var bad = [];
+        if (parseFloat(cs.opacity) < 0.9) bad.push('opacity=' + cs.opacity);
+        if (cs.visibility !== 'visible') bad.push('visibility=' + cs.visibility);
+        if (cs.display === 'none') bad.push('display=none');
+        if (r.width < 20 || r.height < 20) bad.push('尺寸异常 ' + Math.round(r.width) + 'x' + Math.round(r.height));
+        if (r.bottom < 0 || r.top > innerHeight || r.right < 0 || r.left > innerWidth) {
+          bad.push('跑到屏幕外 ' + Math.round(r.left) + ',' + Math.round(r.top));
+        }
+        if (matchMedia('(forced-colors: active)').matches) bad.push('系统高对比度已开启(forced-colors)');
+        if (matchMedia('(prefers-contrast: more)').matches) bad.push('prefers-contrast: more');
+        if (innerHeight < 200) bad.push('可视高度异常 ' + innerHeight);
+        if (!bad.length) return;
+        errs.push(
+          '[inspect] 登录框在 DOM 里但可能看不见：' +
+            bad.join(' | ') +
+            '\n  参考：文字色=' + cs.color + ' 底色=' + cs.backgroundColor + ' z=' + cs.zIndex +
+            ' 视口=' + innerWidth + 'x' + innerHeight + ' dpr=' + window.devicePixelRatio +
+            ' vvScale=' + (vv ? vv.scale : '-') + ' 深色=' + matchMedia('(prefers-color-scheme: dark)').matches,
+        );
+        paint();
+      }, 7000);
     })();
   </script> <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).only=e;window.dispatchEvent(new Event("astro:only"));})();</script><script>(()=>{var A=Object.defineProperty;var g=(i,o,a)=>o in i?A(i,o,{enumerable:!0,configurable:!0,writable:!0,value:a}):i[o]=a;var d=(i,o,a)=>g(i,typeof o!="symbol"?o+"":o,a);{let i={0:t=>m(t),1:t=>a(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(a(t)),5:t=>new Set(a(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t),11:t=>1/0*t},o=t=>{let[l,e]=t;return l in i?i[l](e):void 0},a=t=>t.map(o),m=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([l,e])=>[l,o(e)]));class y extends HTMLElement{constructor(){super(...arguments);d(this,"Component");d(this,"hydrator");d(this,"hydrate",async()=>{var b;if(!this.hydrator||!this.isConnected)return;let e=(b=this.parentElement)==null?void 0:b.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let c=this.querySelectorAll("astro-slot"),n={},h=this.querySelectorAll("template[data-astro-template]");for(let r of h){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of c){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(n[r.getAttribute("name")||"default"]=r.innerHTML)}let p;try{p=this.hasAttribute("props")?m(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",v=this.getAttribute("component-export");throw v&&(s+=` (export ${v})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}let u;await this.hydrator(this)(this.Component,p,n,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))});d(this,"unmount",()=>{this.isConnected||this.dispatchEvent(new CustomEvent("astro:unmount"))})}disconnectedCallback(){document.removeEventListener("astro:after-swap",this.unmount),document.addEventListener("astro:after-swap",this.unmount,{once:!0})}connectedCallback(){if(!this.hasAttribute("await-children")||document.readyState==="interactive"||document.readyState==="complete")this.childrenConnectedCallback();else{let e=()=>{document.removeEventListener("DOMContentLoaded",e),c.disconnect(),this.childrenConnectedCallback()},c=new MutationObserver(()=>{var n;((n=this.lastChild)==null?void 0:n.nodeType)===Node.COMMENT_NODE&&this.lastChild.nodeValue==="astro:end"&&(this.lastChild.remove(),e())});c.observe(this,{childList:!0}),document.addEventListener("DOMContentLoaded",e)}}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}async start(){let e=JSON.parse(this.getAttribute("opts")),c=this.getAttribute("client");if(Astro[c]===void 0){window.addEventListener(`astro:${c}`,()=>this.start(),{once:!0});return}try{await Astro[c](async()=>{let n=this.getAttribute("renderer-url"),[h,{default:p}]=await Promise.all([import(this.getAttribute("component-url")),n?import(n):()=>()=>{}]),u=this.getAttribute("component-export")||"default";if(!u.includes("."))this.Component=h[u];else{this.Component=h;for(let f of u.split("."))this.Component=this.Component[f]}return this.hydrator=p,this.hydrate},e,this)}catch(n){console.error(`[astro-island] Error hydrating ${this.getAttribute("component-url")}`,n)}}attributeChangedCallback(){this.hydrate()}}d(y,"observedAttributes",["props"]),customElements.get("astro-island")||customElements.define("astro-island",y)}})();</script><astro-island uid="Z2swIw7" component-url="/jssj-web-cfworker/_astro/AdminApp.Ds-1c13p.js" component-export="default" renderer-url="/jssj-web-cfworker/_astro/client.B7GYMmcK.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;AdminApp&quot;,&quot;value&quot;:&quot;vue&quot;}"></astro-island>  </main> </div> <!-- 主题面板：四套主题 + 皮肤 + 自定义背景色取色盘（client:only —— 它需要 window） --> <astro-island uid="Hjmqs" component-url="/jssj-web-cfworker/_astro/ThemePanel.SPcf_6NC.js" component-export="default" renderer-url="/jssj-web-cfworker/_astro/client.B7GYMmcK.js" props="{}" ssr client="only" opts="{&quot;name&quot;:&quot;ThemePanel&quot;,&quot;value&quot;:&quot;vue&quot;}"></astro-island> <!-- 图片灯箱（全站共用）
          ★ 与旧站 ui.js 的灯箱**逐项对齐**：关闭 / 上一张 / 下一张 / 序号提示 /
