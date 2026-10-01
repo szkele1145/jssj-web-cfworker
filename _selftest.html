@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh">
+  <head>
+    <meta charset="utf-8" />
+    <title>环境自测（含无痕窗口）</title>
+    <style>
+      body { font: 16px/1.9 system-ui, sans-serif; margin: 32px auto; max-width: 720px; color: #111; }
+      .box { border: 2px solid #ccc; border-radius: 8px; padding: 10px 14px; margin: 8px 0; }
+      .ok { border-color: #1a7f37; background: #eaf7ee; }
+      .bad { border-color: #b42318; background: #fdeceb; }
+      .wait { border-color: #b54708; background: #fff7e6; }
+    </style>
+  </head>
+  <body>
+    <h1>环境自测</h1>
+    <p>把黄/红的编号念给我（绿=成功，黄=一直没变，红=失败）。</p>
+    <div class="box wait" id="b1">① 内联普通脚本：<b>未执行</b></div>
+    <div class="box wait" id="b2">② 内联 module 脚本：<b>未执行</b></div>
+    <div class="box wait" id="b3">③ 外部 module 文件：<b>未执行</b></div>
+    <div class="box wait" id="b4">④ 同源 fetch：<b>未执行</b></div>
+    <div class="box wait" id="b5">⑤ 动态 import()：<b>未执行</b></div>
+    <pre id="ua" style="font-size:12px;color:#666;white-space:pre-wrap"></pre>
+    <noscript><div class="box bad">浏览器报告：JavaScript 被完全禁用</div></noscript>
+
+    <script>
+      document.getElementById('ua').textContent = 'UA: ' + navigator.userAgent;
+      document.getElementById('b1').className = 'box ok';
+      document.getElementById('b1').innerHTML = '① 内联普通脚本：<b>成功 ✅</b>';
+    </script>
+    <script type="module">
+      document.getElementById('b2').className = 'box ok';
+      document.getElementById('b2').innerHTML = '② 内联 module：<b>成功 ✅</b>';
+      try {
+        const r = await fetch('./_selftest.html', { cache: 'no-store' });
+        document.getElementById('b4').className = r.ok ? 'box ok' : 'box bad';
+        document.getElementById('b4').innerHTML = '④ 同源 fetch：<b>' + r.status + '</b>';
+      } catch (e) {
+        document.getElementById('b4').className = 'box bad';
+        document.getElementById('b4').innerHTML = '④ 同源 fetch：<b>失败 ❌ ' + e.message + '</b>';
+      }
+      try {
+        await import('./_selftest.js');
+        document.getElementById('b5').className = 'box ok';
+        document.getElementById('b5').innerHTML = '⑤ 动态 import()：<b>成功 ✅</b>';
+      } catch (e) {
+        document.getElementById('b5').className = 'box bad';
+        document.getElementById('b5').innerHTML = '⑤ 动态 import()：<b>失败 ❌ ' + e.message + '</b>';
+      }
+    </script>
+    <script type="module" src="./_selftest.js"></script>
+  </body>
+</html>
