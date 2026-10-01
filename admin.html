@@ -56,7 +56,11 @@ d.style.colorScheme=(light&&!custom)?"light":"dark";
         paint();
       });
       window.setTimeout(function () {
-        if (!document.getElementById('authOverlay') && !document.querySelector('.admin')) {
+        /* ⚠️ 判据必须用**真实存在的**标记：登录态是 `.auth-box-wrap` + `input[type=password]`，
+         *   登录后是 `.admin`。曾经误判成 `#authOverlay`（那是旧站的 id，新站没有），
+         *   结果在完全正常的页面上也弹红框 —— 自己吓自己。 */
+        var mounted = document.querySelector('.auth-box-wrap, input[type=password], .admin');
+        if (!mounted) {
           errs.push('[timeout] 6 秒内没出现登录界面或后台主体（脚本可能没加载或没执行）');
           paint();
         }
