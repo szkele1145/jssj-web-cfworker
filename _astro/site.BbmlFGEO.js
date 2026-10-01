@@ -1,1 +1,0 @@
-const i="cf",n="/jssj-web-cfworker/";function c(t){const s=String(t??"").replace(/^\/+/,"");if(/^(https?:)?\/\//i.test(t)||t.startsWith("#")||t.startsWith("mailto:"))return t;if(!s)return n;const r=/\.html?$/i.test(s)||s.includes(".")?s:s+".html";return n+r}export{i as T,c as l};
