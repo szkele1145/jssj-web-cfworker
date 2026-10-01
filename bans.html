@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <style>.page-head[data-astro-cid-cjp6lpap]{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;margin-bottom:var(--s-5)}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap]{margin:0;font-size:var(--fs-2xl);color:var(--text-1)}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap] i[data-astro-cid-cjp6lpap]{color:var(--accent);font-size:.8em;margin-right:6px}.page-head[data-astro-cid-cjp6lpap] p[data-astro-cid-cjp6lpap]{margin:6px 0 0;color:var(--text-3);font-size:var(--fs-sm);max-width:62ch}.page-head-extra[data-astro-cid-cjp6lpap]{display:flex;align-items:center;gap:var(--s-2);flex-wrap:wrap}@media(max-width:640px){.page-head[data-astro-cid-cjp6lpap]{align-items:flex-start}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap]{font-size:var(--fs-xl)}}
 .bans-table .card{min-width:0}.ban-filter{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);margin-bottom:var(--s-3)}.ban-search{position:relative;flex:1 1 240px;min-width:0}.ban-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-4);font-size:13px;pointer-events:none}.ban-search input{padding-left:34px;min-height:38px}.ban-count{flex:1 1 100%;min-width:0}.bans-table{--ban-cols: minmax(0, 1.1fr) minmax(0, 2.4fr) minmax(0, .9fr);width:100%;min-width:0}.ban-row{display:grid;grid-template-columns:var(--ban-cols);gap:var(--s-3);align-items:start;padding:var(--s-3) var(--s-2);overflow-wrap:anywhere}.ban-row.header{padding-top:0;padding-bottom:var(--s-2);border-bottom:1px solid var(--border);color:var(--text-4);font-size:var(--fs-xs);letter-spacing:.04em}.ban-row.header span{display:block}.ban-list>.ban-row+.ban-row{border-top:1px solid var(--border-subtle)}.ban-list>.ban-row{transition:background .15s}.ban-list>.ban-row:hover{background:var(--surface-2)}.ban-list>.ban-row.is-target{outline:2px solid var(--accent);outline-offset:2px}.ban-row .player{color:var(--text-1);font-weight:600;font-family:var(--mono);font-size:var(--fs-sm)}.ban-row .reason{color:var(--text-2);font-size:var(--fs-sm);line-height:1.7}.ban-row .date{color:var(--text-4);font-family:var(--mono);font-size:var(--fs-xs);white-space:nowrap}.ban-row .nil{color:var(--text-4)}.bans-note{margin:var(--s-3) 0 0;text-align:center}.card+.actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2);margin-top:var(--s-3)}@media(max-width:640px){.ban-row.header{display:none}.ban-list{display:grid;gap:var(--s-2)}.ban-row{grid-template-columns:minmax(0,1fr);gap:var(--s-1);padding:var(--s-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface-2)}.ban-list>.ban-row+.ban-row{border-top:1px solid var(--border)}.ban-row .player{display:flex;align-items:center;gap:var(--s-2);font-size:var(--fs-base)}.ban-row .player:before{content:"玩家";font-family:var(--font);font-size:var(--fs-2xs);font-weight:400;color:var(--text-4);border:1px solid var(--border);border-radius:var(--r-sm);padding:0 5px;line-height:1.6}.ban-row .reason:before{content:"原因：";color:var(--text-4)}.ban-row .date{padding-top:2px;white-space:normal}.ban-row .date:before{content:"日期：";color:var(--text-4)}}html.skin-game .ban-row .player:before{border-radius:var(--r-sm)}
 </style>

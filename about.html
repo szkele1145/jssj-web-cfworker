@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <style>.card[data-astro-cid-kh7btl4r]{border-width:2px;border-radius:var(--r-lg);background:var(--surface-1);box-shadow:inset 0 2px 0 var(--bevel-hi, rgba(255, 255, 255, .12)),inset 0 -3px 0 var(--bevel-lo, rgba(0, 0, 0, .4));padding:0;overflow-wrap:anywhere}html.skin-tech .card[data-astro-cid-kh7btl4r]{border-width:1px;box-shadow:none}.info-row[data-astro-cid-kh7btl4r]{display:grid;grid-template-columns:minmax(0,168px) minmax(0,1fr);gap:var(--s-2) var(--s-4);align-items:start;padding:var(--s-4)}.info-row[data-astro-cid-kh7btl4r]+.info-row[data-astro-cid-kh7btl4r]{border-top:1px solid var(--border-subtle)}.info-label[data-astro-cid-kh7btl4r]{display:flex;align-items:center;gap:var(--s-2);min-width:0;color:var(--text-3);font-size:var(--fs-sm)}.info-label[data-astro-cid-kh7btl4r]>i[data-astro-cid-kh7btl4r]{color:var(--accent);font-size:var(--fs-sm)}.info-value[data-astro-cid-kh7btl4r]{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2) var(--s-3);min-width:0}.info-value[data-astro-cid-kh7btl4r]>i[data-astro-cid-kh7btl4r]{color:var(--accent);font-size:var(--fs-sm)}.vtext[data-astro-cid-kh7btl4r]{min-width:0;color:var(--text-1);font-size:var(--fs-md);font-weight:500;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}.vpre[data-astro-cid-kh7btl4r]{color:var(--text-4);font-size:var(--fs-2xs);letter-spacing:.06em}.vlink[data-astro-cid-kh7btl4r]{display:inline-flex;flex-direction:column;gap:1px;min-width:0;max-width:100%;padding:var(--s-2) var(--s-3);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--surface-2);font-size:var(--fs-sm);line-height:1.5;transition:background var(--t-fast),border-color var(--t-fast)}.vname[data-astro-cid-kh7btl4r]{display:inline-flex;align-items:center;gap:6px;min-width:0}.vname[data-astro-cid-kh7btl4r] .arrow[data-astro-cid-kh7btl4r]{color:var(--text-4);font-size:9px}.vurl[data-astro-cid-kh7btl4r]{color:var(--text-4);font-family:var(--mono);font-size:var(--fs-2xs);overflow-wrap:anywhere}.vlink[data-astro-cid-kh7btl4r]:hover{background:var(--surface-3);border-color:var(--border-accent);border-left-color:var(--accent)}.vlink[data-astro-cid-kh7btl4r]:hover .vurl[data-astro-cid-kh7btl4r]{color:var(--text-3)}.vrow[data-astro-cid-kh7btl4r]{display:inline-flex;align-items:center;gap:6px;min-width:0;color:var(--text-3);font-size:var(--fs-sm)}.vrow[data-astro-cid-kh7btl4r]>i[data-astro-cid-kh7btl4r]{color:var(--accent)}.vlink-s[data-astro-cid-kh7btl4r]{color:var(--accent);overflow-wrap:anywhere}@media(max-width:640px){.info-row[data-astro-cid-kh7btl4r]{grid-template-columns:minmax(0,1fr);gap:6px;padding:var(--s-3) var(--s-4)}}
 </style>
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/ThemePanel.nbMlUWFT.css">

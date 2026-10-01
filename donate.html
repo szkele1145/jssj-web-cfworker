@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <style>.page-stack{display:grid;gap:var(--s-5);min-width:0}.page-stack>*{min-width:0}.donate-lead{margin:0;color:var(--text-2);font-size:var(--fs-base);line-height:1.8}.donate-lead+.donate-lead{margin-top:2px}.donate-section{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:var(--s-3);margin:var(--s-4) 0}.donate-card{min-width:0;display:flex;flex-direction:column;align-items:center;text-align:center;padding:var(--s-4);border:2px solid var(--border);border-radius:var(--r-lg);background:var(--surface-2)}html.skin-tech .donate-card{border-width:1px}.donate-card .icon{font-size:26px;line-height:1;color:var(--accent)}html.skin-game .donate-card:nth-child(1) .icon{color:var(--g-grass)}html.skin-game .donate-card:nth-child(2) .icon{color:var(--g-diamond)}.donate-card .name{margin-top:var(--s-2);color:var(--text-1);font-size:var(--fs-md);font-weight:600}.donate-card .sub{color:var(--text-4);font-size:var(--fs-sm)}.donate-card .qr{width:100%;max-width:240px;margin-top:var(--s-3)}.donate-card .qr .img-frame{background:var(--surface-1)}.donate-note{padding-top:var(--s-3);border-top:1px solid var(--border-subtle);color:var(--text-3);font-size:var(--fs-sm);line-height:1.8;text-align:center}.donor-list{display:flex;flex-wrap:wrap;gap:var(--s-2);min-height:52px;align-items:center}.donor-list.is-loading,.donor-list.is-empty{display:flex;align-items:center;justify-content:center;gap:var(--s-2);width:100%;padding:var(--s-4);color:var(--text-4);font-size:var(--fs-sm)}.donor-list.is-empty{flex-direction:column;text-align:center}.donor-list .empty-state{width:100%}.donor-list .empty-state i{display:block;font-size:26px;margin-bottom:var(--s-2);opacity:.7}.donor-list .empty-state .btn{margin-top:var(--s-3)}.donor{display:inline-flex;align-items:baseline;gap:var(--s-2);max-width:100%;padding:4px 10px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface-2)}.donor .donor-name{color:var(--text-1);font-size:var(--fs-sm);font-weight:500;overflow-wrap:anywhere}.donor .donor-date{color:var(--text-4);font-size:var(--fs-2xs);font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}.donate-outro{margin:var(--s-4) 0 0;padding-top:var(--s-3);border-top:1px solid var(--border-subtle);color:var(--text-3);font-size:var(--fs-sm)}.donate-links{margin-top:var(--s-2);display:flex;flex-wrap:wrap;gap:var(--s-2)}@media(max-width:420px){.donate-section{grid-template-columns:1fr}.donor-list{gap:var(--s-1)}}@media(max-width:640px){.donate-card .qr{max-width:200px}.donor{flex-wrap:wrap;row-gap:2px}}
 </style>
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/ThemePanel.nbMlUWFT.css">

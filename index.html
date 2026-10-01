@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/index.CIe1_pVm.css">
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/ThemePanel.nbMlUWFT.css">
 <style>.popup-modal[data-v-80a264da]{position:fixed;inset:0;z-index:2000;display:flex;padding:var(--s-4);opacity:0;transition:opacity .22s var(--ease)}.popup-modal.is-open[data-v-80a264da]{opacity:1}.popup-mask[data-v-80a264da]{position:absolute;inset:0;background:#030509a8;backdrop-filter:blur(4px)}.popup-box[data-v-80a264da]{margin:auto;position:relative;width:min(440px,560px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);display:flex;flex-direction:column;padding:var(--s-5);border:2px solid var(--border-strong);border-radius:var(--r-lg);background:var(--surface-solid);box-shadow:var(--sh-3)}html.skin-tech .popup-box[data-v-80a264da]{border-width:1px}.popup-close[data-v-80a264da]{position:absolute;top:6px;right:6px;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:var(--r-md);background:transparent;color:var(--text-4);font-size:16px;cursor:pointer}.popup-close[data-v-80a264da]:hover{background:var(--surface-2);color:var(--text-1)}.popup-title[data-v-80a264da]{margin:0 var(--s-6) var(--s-3) 0;font-size:var(--fs-lg);color:var(--text-1)}.popup-body[data-v-80a264da]{flex:1 1 auto;min-height:0;overflow-y:auto;color:var(--text-2);font-size:var(--fs-base);white-space:pre-wrap;word-break:break-word}.popup-actions[data-v-80a264da]{flex:0 0 auto;display:flex;flex-wrap:wrap;gap:var(--s-3);margin-top:var(--s-5)}body.has-popup-open{overflow:hidden}

@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <style>.block[data-astro-cid-hu6ywz6e]{margin-bottom:var(--s-5)}.empty-state[data-astro-cid-hu6ywz6e] .small[data-astro-cid-hu6ywz6e]{margin-top:var(--s-1);color:var(--text-4);line-height:1.6}.list-warn[data-astro-cid-hu6ywz6e]{list-style:none;padding:0;margin:var(--s-4) 0 0;display:grid;gap:var(--s-2)}.list-warn[data-astro-cid-hu6ywz6e] li[data-astro-cid-hu6ywz6e]{position:relative;padding:var(--s-3) var(--s-3) var(--s-3) 36px;border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:0 var(--r-sm) var(--r-sm) 0;background:var(--surface-2);color:var(--text-2);font-size:var(--fs-sm);line-height:1.7;overflow-wrap:anywhere}.list-warn[data-astro-cid-hu6ywz6e] li[data-astro-cid-hu6ywz6e]:before{content:"";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--danger);font-size:12px;line-height:1}.actions[data-astro-cid-hu6ywz6e]{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-3)}html.skin-game .list-warn[data-astro-cid-hu6ywz6e] li[data-astro-cid-hu6ywz6e]{border-width:2px;border-left-width:3px;box-shadow:inset 0 2px 0 var(--bevel-hi, rgba(255, 255, 255, .12)),inset 0 -3px 0 var(--bevel-lo, rgba(0, 0, 0, .4))}@media(max-width:640px){.list-warn[data-astro-cid-hu6ywz6e] li[data-astro-cid-hu6ywz6e]{padding-left:32px}.list-warn[data-astro-cid-hu6ywz6e] li[data-astro-cid-hu6ywz6e]:before{left:12px}}
 </style>
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/ThemePanel.nbMlUWFT.css">

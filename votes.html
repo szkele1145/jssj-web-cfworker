@@ -4,6 +4,15 @@ var d=document.documentElement,t=localStorage.getItem("theme");
 var sk="game";try{sk=localStorage.getItem("skin")||"game";}catch(e){}
 if(sk!=="tech")sk="game";
 d.classList.add("skin-"+sk);
+/* ★ 兼容模式：?safe=1 打开并**记住**，?safe=0 关掉。
+   实测个别 GPU/驱动在 backdrop-filter（毛玻璃）叠加时会把整页合成为**空白**
+   —— DOM、布局、计算样式全都正常，用户却什么都看不到（只有底色）。
+   命中时给 <html> 加 .no-fx，由 CSS 关掉装饰层与毛玻璃。必须在绘制前执行。 */
+try{
+  if(/[?&]safe=0/.test(location.search))localStorage.removeItem("safeMode");
+  else if(/[?&]safe=1/.test(location.search))localStorage.setItem("safeMode","1");
+  if(localStorage.getItem("safeMode")==="1")d.classList.add("no-fx");
+}catch(e){}
 var light=(t==="light")||(!t&&!window.matchMedia("(prefers-color-scheme: dark)").matches);
 var custom=(t==="custom");
 if(custom){
@@ -25,7 +34,7 @@ if(!v){v='v'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);local
 var b=(window.__JSSJ_API_BASE__||'');
 fetch(b+'/api/track',{method:'POST',headers:{'Content-Type':'application/json'},
   body:JSON.stringify({vid:v,page:location.pathname}),keepalive:true}).catch(function(){});
-}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.7Sv6Kb-z.css">
+}catch(e){}})();</script><link rel="stylesheet" href="/jssj-web-cfworker/_astro/about.CzExCdSP.css">
 <style>.page-head[data-astro-cid-cjp6lpap]{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s-4);flex-wrap:wrap;margin-bottom:var(--s-5)}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap]{margin:0;font-size:var(--fs-2xl);color:var(--text-1)}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap] i[data-astro-cid-cjp6lpap]{color:var(--accent);font-size:.8em;margin-right:6px}.page-head[data-astro-cid-cjp6lpap] p[data-astro-cid-cjp6lpap]{margin:6px 0 0;color:var(--text-3);font-size:var(--fs-sm);max-width:62ch}.page-head-extra[data-astro-cid-cjp6lpap]{display:flex;align-items:center;gap:var(--s-2);flex-wrap:wrap}@media(max-width:640px){.page-head[data-astro-cid-cjp6lpap]{align-items:flex-start}.page-head[data-astro-cid-cjp6lpap] h1[data-astro-cid-cjp6lpap]{font-size:var(--fs-xl)}}
 </style>
 <link rel="stylesheet" href="/jssj-web-cfworker/_astro/votes.CXEiMt00.css">
